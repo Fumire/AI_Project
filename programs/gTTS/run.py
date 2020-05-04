@@ -10,9 +10,9 @@ cursor.execute(query)
 
 for row in cursor.fetchall():
     tts = gtts.gTTS(row["Sentence"], lang=row["Language"], lang_check=False)
-    tts.save("/data/" + row["Identification"] + ".mp3")
+    tts.save("/data/" + row["Identification"] + ".data")
 
-    query = "UPDATE `SpeechList` SET `Status`='complete' WHERE `Identification` LIKE '" + row["Identification"] + "'"
+    query = "UPDATE `SpeechList` SET `Status`='complete', `Link`='https://fumire.moe/made/speech/TTS/" + row["Identification"] + ".data' WHERE `Identification` LIKE '" + row["Identification"] + "'"
     cursor.execute(query)
 
     print(row["Identification"], "Complete!")

@@ -11,7 +11,7 @@ delete:
 	docker rmi $(IMAGE_NAME)
 
 start:
-	docker run --name $(CONTAINER_NAME) --rm --detach --restart "always" --volume /home/fumiremo/public_html/made/speech/TTS:/data --volume $(abspath .):/script --publish $(RANDOM):3306 $(IMAGE_NAME)
+	docker run --name $(CONTAINER_NAME) --detach --restart "always" --volume /home/fumiremo/public_html/made/speech/TTS:/data --volume $(abspath .):/script --publish $(RANDOM):3306 $(IMAGE_NAME)
 
 interact:
 	docker run --name $(CONTAINER_NAME) --rm --interactive --tty --volume /home/fumiremo/public_html/made/speech/TTS:/data --volume $(abspath .):/script --publish $(RANDOM):3306 $(IMAGE_NAME)
