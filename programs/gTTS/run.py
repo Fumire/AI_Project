@@ -2,7 +2,10 @@ import time
 import gtts
 import pymysql
 
-connection = pymysql.connect(host="fumire.moe", user="fumiremo_admin", password="-thsutleo13083-", db="fumiremo_AI", charset="utf8", port=3306)
+with open("../password.txt", "r") as f:
+    password = f.readline().strip()
+
+connection = pymysql.connect(host="fumire.moe", user="fumiremo_admin", password=password, db="fumiremo_AI", charset="utf8", port=3306)
 cursor = connection.cursor(pymysql.cursors.DictCursor)
 
 query = "SELECT * FROM `SpeechList` WHERE `Algorithm` LIKE 'gTTS' AND `Status` LIKE 'wait' ORDER BY `UploadTime` ASC"
