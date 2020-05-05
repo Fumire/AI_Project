@@ -1,0 +1,2 @@
+# kkma
+For Korean tokenizing
