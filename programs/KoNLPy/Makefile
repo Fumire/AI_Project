@@ -1,5 +1,5 @@
-IMAGE_NAME = kkma
-CONTAINER_NAME = KoKoMa
+IMAGE_NAME = okt
+CONTAINER_NAME = OpenKoreanToken
 RANDOM := $(shell bash -c 'echo $$RANDOM')
 
 all:

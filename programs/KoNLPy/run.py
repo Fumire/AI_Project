@@ -8,10 +8,10 @@ def okt_token(text):
     okt = konlpy.tag.Okt()
     answer = ""
     for word, pumsa in okt.pos(text, norm=True):
-        if pumsa == "Josa":
+        if pumsa in ["Josa", "PreEomi", "Eomi", "Suffix", "Punctuation"]:
             answer += word
-        elif pumsa == "Punctuation":
-            answer += word
+        elif pumsa in ["Noun", "Verb", "Adjective", "Determiner", "Adverb", "Conjunction", "Exclamation"]:
+            answer += " " + word
         else:
             answer += " " + word
     return answer
