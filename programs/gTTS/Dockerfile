@@ -7,5 +7,5 @@ EXPOSE 3306
 WORKDIR /script
 VOLUME /data
 
-RUN pip install --no-cache gTTS pymysql
+RUN pip install --no-cache-dir gTTS pymysql
 ENTRYPOINT ["python", "run.py"]
