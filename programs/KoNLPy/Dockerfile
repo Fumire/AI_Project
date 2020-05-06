@@ -11,6 +11,6 @@ EXPOSE 3306
 WORKDIR /script
 VOLUME /data
 
-RUN pip install --no-cache gTTS pymysql konlpy
+RUN pip install --no-cache-dir gTTS pymysql konlpy nltk
 CMD ["/bin/bash"]
 #ENTRYPOINT ["python", "run.py"]
