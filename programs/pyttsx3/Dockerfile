@@ -7,6 +7,10 @@ EXPOSE 3306
 WORKDIR /script
 VOLUME /data
 
-RUN pip install --no-cache pymysql pyttsx3
+RUN pip install --no-cache pymysql pyttsx3 pydub
+
+RUN apt-get update
+RUN apt-get install -y espeak ffmpeg
+
 #ENTRYPOINT ["python", "run.py"]
 CMD ["/bin/bash"]
