@@ -12,7 +12,8 @@ RUN apt-get update
 RUN apt-get install -y libsndfile1 espeak
 
 COPY TTS/requirements.txt /requirements.txt
-RUN pip install --no-cache-dir -r /requirements.txt
+RUN pip install --no-cache numpy==1.14.3
+RUN pip install --no-cache-dir --requirement /requirements.txt
 
 ENV LANG C.UTF-8
 
