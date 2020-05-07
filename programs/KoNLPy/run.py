@@ -1,7 +1,10 @@
+import os
 import time
 import gtts
 import konlpy
 import nltk
+import numpy
+import pydub
 import pymysql
 
 speeches = ["""
@@ -12,10 +15,11 @@ kkma_grammar = """
 NP: {<NR><NNM><J.*>*}
     {<NR>+<SP><NR>}
     {<N.*>+<XSN>?<J.*>*}
+NPS: {<NP>+}
 VP: {<V.*>+<E.*>*}
-    {<N.*><XSV><E.*><J.*>*}
+    {<NP><XSV><E.*><J.*>*}
 AP: {<A.*>*}
-MP: {<M.*>*}
+MP: {<M.*>}
 """
 
 kkma = konlpy.tag.Kkma()
@@ -44,15 +48,36 @@ def join_phrase(phrase):
 
 for raw_sentences in speeches:
     mp3_count = 0
+    mp3_file = pydub.AudioSegment.silent(duration=0)
+
     sentences = "".join(list(map(lambda x: x[0] if x[1] == "Josa" else " " + x[0], okt.pos(raw_sentences.strip()))))
     for sentence in kkma.sentences(sentences):
         words = kkma.pos(sentence)
         tree = nltk.RegexpParser(kkma_grammar).parse(words)
         for subtree in tree:
+            print(subtree)
             if isinstance(subtree, nltk.tree.Tree):
                 phrase = join_phrase(list(map(lambda x: x[0], subtree.leaves())))
             elif isinstance(subtree, tuple):
                 phrase = subtree[0]
             else:
                 raise ValueError(str(type(subtree)) + str(subtree))
-            print(phrase)
+
+            try:
+                tts = gtts.gTTS(phrase, lang="ko-KR", lang_check=False)
+                tts.save("/tmp/" + str(mp3_count) + ".mp3")
+            except AssertionError:
+                pydub.AudioSegment.silent(duration=500).export("/tmp/" + str(mp3_count) + ".mp3", format="mp3")
+            finally:
+                mp3_count += 1
+
+    for i in range(mp3_count):
+        print(i, "/", mp3_count)
+        mp3_file += pydub.AudioSegment.from_file("/tmp/" + str(i) + ".mp3")[:-200].fade_in(100).fade_out(100)
+        os.remove("/tmp/" + str(i) + ".mp3")
+
+    mp3_file.export("/data/tmp.mp3", format="mp3")
+    print("Done!!")
+    break
+
+time.sleep(1)
