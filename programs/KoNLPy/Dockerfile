@@ -11,6 +11,5 @@ EXPOSE 3306
 WORKDIR /script
 VOLUME /data
 
-RUN pip install --no-cache-dir pyttsx3 pymysql konlpy nltk pydub
-CMD ["/bin/bash"]
-#ENTRYPOINT ["python", "run.py"]
+RUN pip install --no-cache-dir pymysql konlpy nltk pydub gtts
+ENTRYPOINT ["python", "run.py"]
