@@ -20,7 +20,7 @@ MP: {<M.*>*}
 parser = nltk.RegexpParser(grammar)
 
 kkma = konlpy.tag.Kkma()
-mecab = konlpy.tag._mecab.Mecab("./mecab-ko-dic")
+komoran = konlpy.tag._komoran.Komoran()
 
 with open("password.txt", "r") as f:
     password = f.readline().strip()
@@ -29,10 +29,10 @@ with open("password.txt", "r") as f:
 # cursor = connection.cursor(pymysql.cursors.DictCursor)
 
 # query = "SELECT * FROM `SpeechList` WHERE `Algorithm` LIKE 'kkma' AND `Status` LIKE 'wait' ORDER BY `UploadTime` ASC"
-# cursor.execute(query)
+# cursor.execute(query):
 
 for sentence in kkma.sentences(speech):
-    words = kkma.pos(sentence)
+    words = komoran.pos(sentence)
     chunks = parser.parse(words)
 
     chunks.pprint()
