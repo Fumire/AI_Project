@@ -13,7 +13,7 @@ cursor.execute(query)
 
 for row in cursor.fetchall():
     if os.path.isfile("/data/" + row["Identification"] + ".data"):
-        if (os.path.getatime("/data/" + row["Identification"] + ".data") - time.time() / 1000) > (60 * 60 * 24):
+        if (time.time() - os.path.getatime("/data/" + row["Identification"] + ".data")) > (60 * 60 * 24):
             os.remove("/data/" + row["Identification"] + ".data")
             query = "UPDATE `SpeechList` SET `Status`='expired', `Link`=NULL WHERE `Identification` LIKE '" + row["Identification"] + "'"
             cursor.execute(query)
