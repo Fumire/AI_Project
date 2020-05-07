@@ -11,7 +11,6 @@ EXPOSE 3306
 WORKDIR /script
 VOLUME /data
 
-RUN pip install --no-cache-dir gTTS pymysql konlpy nltk
-RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | /bin/bash
+RUN pip install --no-cache-dir gTTS pymysql konlpy nltk pydub
 CMD ["/bin/bash"]
 #ENTRYPOINT ["python", "run.py"]
