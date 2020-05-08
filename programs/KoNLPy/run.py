@@ -1,6 +1,7 @@
 import functools
 import os
 import time
+import re
 import gtts
 import konlpy
 import nltk
@@ -8,15 +9,17 @@ import pydub
 import pymysql
 
 kkma_grammar = """
-MP: {<M.*>*}
+MP: {<M.*>*<JX>?}
 NP: {(<NR|ON><NNM>)+<J.*>*}
     {<NR|ON>(<SP><NR|ON>)*<NN.*>*<J.*>*}
-    {<MP>?<NN.*><XSN>?(<JC|SP|JKG>?<NN.*><XSN>?)*<J.*>*}
-    {<MP>?<N.*><XSN>?(<SP>?<N.*><XSN>?)*<J.*>*}
-VP: {<MP>?(<V.*><E.*>*)+}
-    {<NP><XSV><E.*><J.*>*}
-    {<NP><VC.*><E.*>?}
+    {<MP>?<XPN>?<NN.*><XSN>?(<JC|SP|JKG>?<NN.*><XSN>?)*<J.*>*}
+    {<MP>?<XPN>?<N.*><XSN>?(<SP>?<N.*><XSN>?)*<J.*>*}
+VP: {<MP>?(<V.*><E.*>*)+<SP|SF>?}
+    {<NP><XSV><E.*|J.*>*<SP|SF>?}
+    {<NP><VC.*><E.*>?<SP|SF>?}
 AP: {<MP>?<A.*>+}
+    {<XR><XSA><E.*>?}
+    {<NP><XSA><E.*|J.*>*<SP|SF>?}
 """
 
 kkma = konlpy.tag.Kkma()
@@ -31,9 +34,11 @@ cursor = connection.cursor(pymysql.cursors.DictCursor)
 query = "SELECT * FROM `SpeechList` WHERE `Algorithm` LIKE 'kkma' AND `Status` LIKE 'wait' ORDER BY `UploadTime` ASC"
 cursor.execute(query)
 
+regex = re.compile(r"[^ ㄱ-ㅣ|가-힣|0-9|\.,·]+")
+
 
 def join_phrase(phrase):
-    adding = {"ㄴ": 4, "ㄹ": 8, "ㅁ": 16}
+    adding = {"ㄴ": 4, "ㄹ": 8, "ㅁ": 16, "ㅂ": 17}
     answer = phrase[0]
     for p in phrase[1:]:
         if (p[0] in adding) and ((ord(answer[-1]) - ord("가")) % 28 == 0):
@@ -46,7 +51,7 @@ def join_phrase(phrase):
 for row in cursor.fetchall():
     mp3_count = 0
     mp3_file = pydub.AudioSegment.silent(duration=0)
-    raw_sentences = row["Sentence"]
+    raw_sentences = regex.sub("", row["Sentence"])
 
     if functools.reduce(lambda a, b: a if a > len(b) else len(b), raw_sentences.split(), 0) > 20:
         sentences = "".join(list(map(lambda x: (x[0]) if (x[1] in ["Josa", "Unknown"]) else (" " + x[0]), okt.pos(raw_sentences.strip()))))
@@ -54,7 +59,7 @@ for row in cursor.fetchall():
         sentences = raw_sentences.strip()
 
     for sentence in kkma.sentences(sentences):
-        words = kkma.pos(sentence)
+        words = list(functools.reduce(lambda a, b: a + b, kkma.pos(sentence, flatten=False), []))
         tree = nltk.RegexpParser(kkma_grammar).parse(words)
         for subtree in tree:
             print(subtree)
@@ -84,4 +89,4 @@ for row in cursor.fetchall():
     cursor.execute(query)
     print("Done!!")
 
-time.sleep(1)
+time.sleep(60)
