@@ -93,7 +93,10 @@ for row in cursor.fetchall():
                 tts = gtts.gTTS(phrase, lang="ko-KR", lang_check=False)
                 tts.save("/tmp/" + str(mp3_count) + ".mp3")
             except AssertionError:
-                pydub.AudioSegment.silent(duration=300).export("/tmp/" + str(mp3_count) + ".mp3", format="mp3")
+                if phrase in [",", ";", "·"]:
+                    pydub.AudioSegment.silent(duration=300).export("/tmp/" + str(mp3_count) + ".mp3", format="mp3")
+                else:
+                    pydub.AudioSegment.silent(duration=500).export("/tmp/" + str(mp3_count) + ".mp3", format="mp3")
             finally:
                 mp3_count += 1
 
