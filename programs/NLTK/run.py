@@ -12,7 +12,7 @@ NP: {<PRP\$><JJ.*><NN.*>}
     {<RB>?<DT>?<CD|JJ.*|PRP\$>*<NN.*|PRP.?|VBG>+((<,><CD|JJ.*|PRP\$>*<NN.*|PRP.?|VBG>+)*<CC><CD|JJ.*|PRP\$>*<NN.*|PRP.?|VBG>+)?}
     {<JJS><IN><PRP|PRP\$>}
     {<DT>?<WDT|WP><VB|VBP|VBZ>}
-    {<DT>}
+    {<DT><RBS>}
 
 SP: {<NP><VB|VBZ><VBN>?}
     {<NP><VBP><VBG|VBN>*}
