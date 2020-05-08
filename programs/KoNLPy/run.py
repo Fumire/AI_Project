@@ -55,12 +55,12 @@ def join_phrase(phrase):
     answer = phrase[0][0]
     for p, pos in phrase[1:]:
         if (p[0] in adding):
-            if pos.startswith("J") or pos.startswith("E"):
+            if pos.startswith("J") or pos.startswith("E") or pos.startswith("XS"):
                 answer = answer[:-1] + chr(((ord(answer[-1]) - ord("가")) // 28 * 28) + ord("가") + adding[p[0]]) + p[1:]
             else:
                 answer = answer[:-1] + " " + chr(((ord(answer[-1]) - ord("가")) // 28 * 28) + ord("가") + adding[p[0]]) + p[1:]
         else:
-            if pos.startswith("J") or pos.startswith("E"):
+            if pos.startswith("J") or pos.startswith("E") or pos.startswith("XS"):
                 answer += p
             else:
                 answer += " " + p
