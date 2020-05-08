@@ -88,7 +88,6 @@ for row in cursor.fetchall():
                 phrase = subtree[0]
             else:
                 raise ValueError(str(type(subtree)) + str(subtree))
-            print(phrase)
 
             try:
                 tts = gtts.gTTS(phrase, lang="ko-KR", lang_check=False)
