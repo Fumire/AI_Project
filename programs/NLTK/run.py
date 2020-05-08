@@ -82,7 +82,7 @@ for row in cursor.fetchall():
     query = "UPDATE `SpeechList` SET `Status`='complete', `Link`='https://fumire.moe/made/speech/TTS/" + row["Identification"] + ".data' WHERE `Identification` LIKE '" + row["Identification"] + "'"
     cursor.execute(query)
 
-    mp3_file.export("/data/tmp.mp3", format="mp3")
+    mp3_file.export("/data/" + row["Identification"] + ".data", format="mp3")
     print("Done!!")
 
 time.sleep(60)
