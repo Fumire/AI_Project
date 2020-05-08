@@ -9,17 +9,30 @@ import pydub
 import pymysql
 
 kkma_grammar = """
-MP: {<M.*>*<JX>?}
-NP: {(<NR|ON><NNM>)+<J.*>*}
-    {<NR|ON>(<SP><NR|ON>)*<NN.*>*<J.*>*}
-    {<MP>?<XPN>?<NN.*><XSN>?(<JC|SP|JKG>?<NN.*><XSN>?)*<J.*>*}
-    {<MP>?<XPN>?<N.*><XSN>?(<SP>?<N.*><XSN>?)*<J.*>*}
-VP: {<MP>?(<V.*><E.*>*)+<SP|SF>?}
-    {<NP><XSV><E.*|J.*>*<SP|SF>?}
-    {<NP><VC.*><E.*>?<SP|SF>?}
-AP: {<MP>?<A.*>+}
-    {<XR><XSA><E.*>?}
-    {<NP><XSA><E.*|J.*>*<SP|SF>?}
+AP: {<NP><XSV><E.*>*<ETD>}
+    {<NP><JKM>}
+    {<VA|VV><ETD>}
+    {<XR><XSA><ECE>}
+
+VP: {<MP>?<V.*><E.*>*(<V.*><E.*>*)*<EC.|EF.|ET.>}
+    {<MP>?<NNG>+<XSV><E.*>*<EC.|EF.|ET.>}
+
+NP: {<AP>?<N.*><XSV><ETN>}
+    {<UN>}
+    {<VP><NNB|NNM>}
+    {<N.*><XSV><ETD>?<NNB|NNM>}
+    {<AP>?<MDN|MDT>?<N.*>*<XSN>?(<JC|JKG><N.*>*<XSN>?)*}
+
+DP: {<NP><VCN|VCP><ECE|ETD>}
+    {<VX.><E.*>*<ETD>}
+
+XJ: {(<NP><JC>)*<NP><J.*>*<JX>}
+    {<VP><JX>}
+OJ: {(<NP><JC>)*<NP><J.*>*<JKO>}
+    {<VP><JKO>}
+SJ: {(<NP><JC>)*<NP><J.*>*<JKS>}
+MJ: {(<NP><JC>)*<NP><J.*>*<JKM>}
+CJ: {(<NP><JC>)*<NP><J.*>*<JKC>}
 """
 
 kkma = konlpy.tag.Kkma()
@@ -39,12 +52,18 @@ regex = re.compile(r"[^ ㄱ-ㅣ|가-힣|0-9|\.,·]+")
 
 def join_phrase(phrase):
     adding = {"ㄴ": 4, "ㄹ": 8, "ㅁ": 16, "ㅂ": 17}
-    answer = phrase[0]
-    for p in phrase[1:]:
-        if (p[0] in adding) and ((ord(answer[-1]) - ord("가")) % 28 == 0):
-            answer = answer[:-1] + chr(ord(answer[-1]) + adding[p[0]]) + p[1:]
+    answer = phrase[0][0]
+    for p, pos in phrase[1:]:
+        if (p[0] in adding):
+            if pos.startswith("J") or pos.startswith("E"):
+                answer = answer[:-1] + chr(((ord(answer[-1]) - ord("가")) // 28 * 28) + ord("가") + adding[p[0]]) + p[1:]
+            else:
+                answer = answer[:-1] + " " + chr(((ord(answer[-1]) - ord("가")) // 28 * 28) + ord("가") + adding[p[0]]) + p[1:]
         else:
-            answer += p
+            if pos.startswith("J") or pos.startswith("E"):
+                answer += p
+            else:
+                answer += " " + p
     return answer
 
 
@@ -64,17 +83,18 @@ for row in cursor.fetchall():
         for subtree in tree:
             print(subtree)
             if isinstance(subtree, nltk.tree.Tree):
-                phrase = join_phrase(list(map(lambda x: x[0], subtree.leaves())))
+                phrase = join_phrase(subtree.leaves())
             elif isinstance(subtree, tuple):
                 phrase = subtree[0]
             else:
                 raise ValueError(str(type(subtree)) + str(subtree))
+            print(phrase)
 
             try:
                 tts = gtts.gTTS(phrase, lang="ko-KR", lang_check=False)
                 tts.save("/tmp/" + str(mp3_count) + ".mp3")
             except AssertionError:
-                pydub.AudioSegment.silent(duration=100).export("/tmp/" + str(mp3_count) + ".mp3", format="mp3")
+                pydub.AudioSegment.silent(duration=300).export("/tmp/" + str(mp3_count) + ".mp3", format="mp3")
             finally:
                 mp3_count += 1
 
