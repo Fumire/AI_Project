@@ -7,7 +7,7 @@ EXPOSE 3306
 WORKDIR /script
 VOLUME /data
 
-RUN pip install --no-cache-dir gtts pymysql nltk pydub
+RUN pip install --no-cache-dir gtts pymysql nltk pydub emoji
 RUN python3 -m nltk.downloader all
 
 RUN wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-02-27.zip -O /stanford-corenlp-full-2018-02-27.zip

@@ -1,6 +1,6 @@
 import os
 import time
-import re
+import emoji
 import gtts
 import nltk
 import pydub
@@ -38,13 +38,11 @@ AP: {<DT|RB>?<JJ.*>}
 with open("password.txt", "r") as f:
     password = f.readline().strip()
 
-connection = pymysql.connect(host="fumire.moe", user="fumiremo_remote", password=password, db="fumiremo_AI", charset="utf8", port=3306)
+connection = pymysql.connect(host="fumire.moe", user="fumiremo_remote", password=password, db="fumiremo_AI", charset="utf8mb4", port=3306)
 cursor = connection.cursor(pymysql.cursors.DictCursor)
 
 query = "SELECT * FROM `SpeechList` WHERE `Algorithm` LIKE 'NLTK' AND `Status` LIKE 'wait' ORDER BY `UploadTime` ASC"
 cursor.execute(query)
-
-regex = re.compile(r"^[a-zA-Z0-9$@$!%*?&#^-_. +]+$")
 
 for row in cursor.fetchall():
     speech = row["Sentence"]
@@ -52,7 +50,8 @@ for row in cursor.fetchall():
     mp3_file = pydub.AudioSegment.silent(duration=0)
 
     for sentence in nltk.sent_tokenize(speech):
-        words = nltk.pos_tag(nltk.word_tokenize(regex.sub("", sentence)))
+        sentence = emoji.demojize(sentence)
+        words = nltk.pos_tag(nltk.word_tokenize(sentence))
         tree = nltk.RegexpParser(grammar).parse(words)
         for subtree in tree:
             print(subtree)
